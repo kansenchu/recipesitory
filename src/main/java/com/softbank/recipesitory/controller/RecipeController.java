@@ -49,12 +49,12 @@ public class RecipeController {
 	}
 	
 	@RequestMapping(value="/{id}", method=RequestMethod.PATCH)
-	public Recipe editRecipe(@PathVariable int id, @Valid @RequestBody Recipe Recipe){
+	public Recipe editRecipe(@PathVariable int id, @Valid @RequestBody Recipe Recipe) throws InvalidRecipeException{
 		return recipeService.editRecipe(id, Recipe);
 	}
 
 	@RequestMapping(value="/{id}", method=RequestMethod.DELETE)
-	public Recipe removeRecipe(@PathVariable int id){
+	public Recipe removeRecipe(@PathVariable int id) throws InvalidRecipeException{
 		return recipeService.removeRecipe(id);
 	}
 }

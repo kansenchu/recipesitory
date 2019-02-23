@@ -1,6 +1,7 @@
 package com.softbank.recipesitory.service;
 
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -72,18 +73,28 @@ public class RecipeService {
 	 * @param id of the Recipe to be updated
 	 * @param Recipe the new details of the Recipe
 	 * @return the currently inserted record of id
+	 * @throws InvalidRecipeException 
 	 */
-	public Recipe editRecipe(int id, Recipe Recipe) {
-		return null;
+	public Recipe editRecipe(int id, Recipe recipe) throws InvalidRecipeException {
+		return repository.findById(id).map((Function<RecipeDao, Recipe>) oldRecipe -> {
+			recipe.setId(oldRecipe.getId());
+			RecipeDao recipeDao = mapToRecipeDao(recipe);
+			return mapToRecipe(repository.save(recipeDao));
+		}).orElseThrow(notFound);
 	}
 	
 	/**
 	 * Removes the given Recipe.
 	 * @param id of the Recipe to be deleted.
 	 * @return the deleted Recipe
+	 * @throws InvalidRecipeException 
 	 */
-	public Recipe removeRecipe(int id) {
-		return null;
+	public Recipe removeRecipe(int id) throws InvalidRecipeException {
+		return repository.findById(id)
+				.map((Function<RecipeDao, Recipe>) recipe -> {
+					repository.delete(recipe);
+					return mapToRecipe(recipe);
+				}).orElseThrow(notFound);
 	}
 	
 	private Recipe mapToRecipe(RecipeDao RecipeDao) {

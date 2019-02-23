@@ -17,6 +17,8 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.TransactionSystemException;
 
@@ -31,6 +33,7 @@ import com.softbank.recipesitory.service.RecipeService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 public class RecipeServiceTest {
 
 	@Rule
@@ -108,7 +111,7 @@ public class RecipeServiceTest {
 	}
 	
 	@Test
-	public void editRecipe() throws JsonParseException, JsonMappingException, IOException {
+	public void editRecipe() throws JsonParseException, JsonMappingException, IOException, InvalidRecipeException {
 		//setup
 		List<Recipe> expectedRecipeList = jsonMapper.readValue(allRecipesJson, new TypeReference<List<Recipe>>(){});
 		Recipe newRecipe = jsonMapper.readValue(additionalRecipeJson, Recipe.class);
@@ -128,7 +131,7 @@ public class RecipeServiceTest {
 	}
 	
 	@Test
-	public void editRecipe_nonexistent() throws JsonParseException, JsonMappingException, IOException {
+	public void editRecipe_nonexistent() throws JsonParseException, JsonMappingException, IOException, InvalidRecipeException {
 		//setup
 		expectedEx.expect(InvalidRecipeException.class);
 		expectedEx.expectMessage(Messages.NOT_FOUND.getMessage());
@@ -143,7 +146,7 @@ public class RecipeServiceTest {
 	}
 	
 	@Test
-	public void removeRecipe() throws JsonParseException, JsonMappingException, IOException{
+	public void removeRecipe() throws JsonParseException, JsonMappingException, IOException, InvalidRecipeException{
 		//setup
 		List<Recipe> expectedRecipeList = jsonMapper.readValue(allRecipesJson, new TypeReference<List<Recipe>>(){});
 		Recipe expectedRecipe = expectedRecipeList.remove(0);
@@ -158,7 +161,7 @@ public class RecipeServiceTest {
 	}
 	
 	@Test
-	public void removeRecipe_nonexistent() {
+	public void removeRecipe_nonexistent() throws InvalidRecipeException {
 		//setup
 		expectedEx.expect(InvalidRecipeException.class);
 		expectedEx.expectMessage(Messages.NOT_FOUND.getMessage());
