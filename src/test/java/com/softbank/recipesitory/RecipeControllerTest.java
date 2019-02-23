@@ -18,8 +18,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.softbank.recipesitory.controller.RecipeController;
+import com.softbank.recipesitory.dao.RecipeDao;
 import com.softbank.recipesitory.models.Recipe;
-import com.softbank.recipesitory.models.RecipeDao;
 import com.softbank.recipesitory.service.RecipeService;
 
 @RunWith(SpringRunner.class)

@@ -1,4 +1,4 @@
-package com.softbank.recipesitory.models;
+package com.softbank.recipesitory.dao;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

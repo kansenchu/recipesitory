@@ -2,13 +2,30 @@ package com.softbank.recipesitory.service;
 
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.validation.Valid;
+
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import com.softbank.recipesitory.dao.RecipeDao;
 import com.softbank.recipesitory.models.Recipe;
+import com.softbank.recipesitory.repository.RecipeRepo;
 
+/**
+ * JDBC ドライバが裏で働いてるレシピサービス。
+ * ドライバはRecipeRepoで管理する.
+ * @author pikachoo
+ * @see {@link RecipeRepo}
+ */
 @Service
 public class RecipeService {
+	
+	@Inject
+	RecipeRepo repository;
+	
+	ModelMapper mapper = new ModelMapper();
+	
 	/**
 	 * Retrieve a Recipe with the given id.
 	 * @param id reference to desired Recipe
@@ -54,5 +71,11 @@ public class RecipeService {
 		return null;
 	}
 	
+	private Recipe mapToRecipe(RecipeDao RecipeDao) {
+		return mapper.map(RecipeDao, Recipe.class);
+	}
 	
+	private RecipeDao mapToRecipeDao(Recipe Recipe) {
+		return mapper.map(Recipe, RecipeDao.class);
+	}
 }

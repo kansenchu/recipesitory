@@ -14,7 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.softbank.recipesitory.models.Recipe;
 import com.softbank.recipesitory.service.RecipeService;
 
-
+/**
+ * レシピリクエストをやりとりするコントローラ
+ * @author pikachoo
+ *
+ */
 @RestController
 @RequestMapping("/recipes")
 public class RecipeController {
@@ -22,6 +26,11 @@ public class RecipeController {
 	@Inject
 	RecipeService recipeService;
 
+	/**
+	 * 一個のレシピを取得する。
+	 * @param id 取得したいレシピID
+	 * @return 
+	 */
 	@RequestMapping(value="/{id}", method=RequestMethod.GET)
 	public Recipe getRecipe(@PathVariable int id){
 		return recipeService.getRecipe(id);
