@@ -38,7 +38,7 @@ public class RecipeController {
 		return recipeService.getRecipe(id);
 	} 
 	
-	@RequestMapping(value="/", method=RequestMethod.GET)
+	@RequestMapping(value="", method=RequestMethod.GET)
 	public List<Recipe> getRecipes(){
 		return recipeService.getRecipes();
 	}
