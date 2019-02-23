@@ -44,7 +44,6 @@ public class RecipeControllerTest {
 	@Test
 	public void getARecipe() throws Exception {
 		//setup
-//		RecipeDao data = jsonMapper.readValue(oneRecipeJson, RecipeDao.class);
 		Recipe expected = jsonMapper.readValue(oneRecipeJson, Recipe.class);
 		int recipeId = expected.getId();
 		when(mockRecipeService.getRecipe(recipeId)).thenReturn(expected);
@@ -67,7 +66,7 @@ public class RecipeControllerTest {
 	}
 	
 	@Test
-	public void addRecipe() {
+	public void addRecipe() throws Exception {
 		//setup
 		Recipe newRecipe = mock(Recipe.class);
 		when(mockRecipeService.addRecipe(newRecipe)).thenReturn(newRecipe);
@@ -81,7 +80,7 @@ public class RecipeControllerTest {
 	}
 	
 	@Test
-	public void editRecipe() {
+	public void editRecipe() throws Exception {
 		//setup
 		Recipe expected = mock(Recipe.class);
 		int id = 0;
@@ -96,7 +95,7 @@ public class RecipeControllerTest {
 	}
 	
 	@Test
-	public void removeRecipe() {
+	public void removeRecipe() throws Exception {
 		//setup
 		Recipe expected = mock(Recipe.class);
 		int id = 0;
