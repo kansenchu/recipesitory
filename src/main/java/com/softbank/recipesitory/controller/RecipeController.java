@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.softbank.recipesitory.exception.InvalidRecipeException;
 import com.softbank.recipesitory.models.Recipe;
 import com.softbank.recipesitory.service.RecipeService;
 
@@ -30,9 +31,10 @@ public class RecipeController {
 	 * 一個のレシピを取得する。
 	 * @param id 取得したいレシピID
 	 * @return 
+	 * @throws InvalidRecipeException 
 	 */
 	@RequestMapping(value="/{id}", method=RequestMethod.GET)
-	public Recipe getRecipe(@PathVariable int id){
+	public Recipe getRecipe(@PathVariable int id) throws InvalidRecipeException{
 		return recipeService.getRecipe(id);
 	} 
 	
@@ -42,7 +44,7 @@ public class RecipeController {
 	}
 	
 	@RequestMapping(method=RequestMethod.POST)
-	public Recipe addRecipe(@Valid @RequestBody Recipe newRecipe){
+	public Recipe addRecipe(@Valid @RequestBody Recipe newRecipe) throws InvalidRecipeException{
 		return recipeService.addRecipe(newRecipe);
 	}
 	

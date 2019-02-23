@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -31,6 +32,7 @@ public class RecipeDao {
 	@NotNull
 	private String title;			/** レシピの名前 */
 	@NotNull
+	@Column(name="making_time")
 	private String makingTime;		/** レシピの作り時間 */
 	@NotNull
 	private String serves;			/** レシピに対応する人数 */

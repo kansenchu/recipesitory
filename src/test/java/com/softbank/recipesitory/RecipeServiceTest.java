@@ -51,7 +51,7 @@ public class RecipeServiceTest {
 	ObjectMapper jsonMapper = new ObjectMapper();
 	
 	@Test
-	public void getOneRecipe() throws JsonParseException, JsonMappingException, IOException {
+	public void getOneRecipe() throws JsonParseException, JsonMappingException, IOException, InvalidRecipeException {
 		//setup
 		Recipe expected = jsonMapper.readValue(oneRecipeJson, Recipe.class);
 		int testRecipeId = expected.getId();
@@ -64,7 +64,7 @@ public class RecipeServiceTest {
 	}
 	
 	@Test
-	public void getOneRecipe_nonexistent() {
+	public void getOneRecipe_nonexistent() throws InvalidRecipeException {
 		//setup
 		expectedEx.expect(InvalidRecipeException.class);
 		expectedEx.expectMessage(Messages.NOT_FOUND.getMessage());
@@ -89,7 +89,7 @@ public class RecipeServiceTest {
 	}
 
 	@Test
-	public void addRecipe() throws JsonParseException, JsonMappingException, IOException{
+	public void addRecipe() throws JsonParseException, JsonMappingException, IOException, InvalidRecipeException{
 		//setup
 		List<Recipe> expectedRecipeList = jsonMapper.readValue(allRecipesJson, new TypeReference<List<Recipe>>(){});
 		Recipe newRecipe = jsonMapper.readValue(additionalRecipeJson, Recipe.class);
@@ -105,31 +105,6 @@ public class RecipeServiceTest {
 		//verify
 		assertEquals(expectedRecipe, actual);
 		assertEquals(expectedRecipeList, actualRecipeList);
-	}
-	
-	/**
-	 * Validation is actually done at controller level. This test is a template
-	 * in case we still want to test at service level.
-	 * @throws JsonParseException
-	 * @throws JsonMappingException
-	 * @throws IOException
-	 */
-	@Ignore
-	@Test
-	public void addRecipe_noTitle() throws JsonParseException, JsonMappingException, IOException{
-		Recipe newRecipe = jsonMapper.readValue(additionalRecipeJson, Recipe.class);
-		newRecipe.setTitle(null);
-		
-		//act
-		try {
-			recipeService.addRecipe(newRecipe);
-		} catch (TransactionSystemException ex) {
-			if (! (ex.getCause() instanceof RollbackException ||
-					ex.getCause().getCause() instanceof ConstraintViolationException)){
-				fail();
-			}
-		}
-		
 	}
 	
 	@Test
