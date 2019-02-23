@@ -3,9 +3,11 @@ package com.softbank.recipesitory.service;
 import java.util.List;
 
 import javax.validation.Valid;
+import org.springframework.stereotype.Service;
 
 import com.softbank.recipesitory.models.Recipe;
 
+@Service
 public class RecipeService {
 	/**
 	 * Retrieve a Recipe with the given id.

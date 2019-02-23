@@ -1,6 +1,10 @@
 package com.softbank.recipesitory.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,6 +19,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class Recipe {
 	@JsonView(RecipeViews.IncludeId.class)
 	private int id;
@@ -23,7 +29,7 @@ public class Recipe {
 	private String title;			/** レシピの名前 */
 	
 	@JsonView(RecipeViews.ExcludeId.class)
-	private String makingTime;		/** レシピの作り時間 */
+	private String makingTime;		/** レシピの作り時間。実際JSONではmaking_timeになります*/
 	
 	@JsonView(RecipeViews.ExcludeId.class)
 	private String serves;			/** レシピに対応する人数 */
@@ -33,4 +39,6 @@ public class Recipe {
 	
 	@JsonView(RecipeViews.ExcludeId.class)
 	private String cost;			/** レシピの予測値段。intではなく, Stringです。 */
+	
+	
 }
