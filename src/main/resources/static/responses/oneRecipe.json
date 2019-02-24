@@ -1,12 +1,10 @@
 {
-	"message": "Recipe Details By Id",
-	"recipe": [
-		{
-			"title": "チキンカレー",
-			"making_time": "45分",
-			"serves": "4人",
-			"ingredients": "玉ねぎ,肉,スパイス",
-			"cost": 1000
-		}
-	]
+	"message":"Recipe details by id",
+	"recipe":[{
+		"title":"チキンカレー",
+		"making_time":"45分",
+		"serves":"4人",
+		"ingredients":"玉ねぎ,肉,スパイス",
+		"cost":"1000"
+	}]
 }

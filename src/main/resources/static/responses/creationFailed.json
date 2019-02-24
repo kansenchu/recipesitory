@@ -1,4 +1,4 @@
 {
 	"message": "Recipe creation failed!",
-	"missing": "title, serves, cost"
+	"required": "title, serves, cost"
 }

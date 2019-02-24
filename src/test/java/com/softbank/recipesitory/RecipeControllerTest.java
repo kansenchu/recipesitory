@@ -20,6 +20,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -65,11 +66,11 @@ public class RecipeControllerTest {
 	@Value("${json.config.creationFailedResponse}")
 	File creationFailedResponse;
 	
-	@InjectMocks
-	RecipeController rController;
-	
 	@Mock
 	RecipeService mockRecipeService;
+	
+	@InjectMocks
+	RecipeController rController;
 	
 	@Inject
 	WebApplicationContext wac;
@@ -95,7 +96,7 @@ public class RecipeControllerTest {
 		//setup
 		Recipe expectedRecipe = jsonMapper.readValue(oneRecipeJson, Recipe.class);
 		int recipeId = expectedRecipe.getId();
-		when(mockRecipeService.getRecipe(recipeId)).thenReturn(expectedRecipe);
+		//when(mockRecipeService.getRecipe(recipeId)).thenReturn(expectedRecipe);
 		
 		String requestUrl = String.format(urlTemplate, port, recipeId);
 		String expected = new String(Files.readAllBytes(oneRecipeResponse.toPath()));
@@ -111,10 +112,28 @@ public class RecipeControllerTest {
 	}
 	
 	@Test
+	public void getNonexistentRecipe() throws Exception {
+		//setup
+		int recipeId = 999;
+		
+		String requestUrl = String.format(urlTemplate, port, recipeId);
+		String expected = new String(Files.readAllBytes(notFoundResponse.toPath()));
+		
+		//act
+		mockMvc.perform(MockMvcRequestBuilders.get(requestUrl))
+		
+		//verify
+				.andExpect(status().isOk())
+				.andExpect(content().contentType("application/json;charset=UTF-8"))
+				.andExpect(content().json(expected));
+		//verify(mockRecipeService).getRecipe(recipeId);
+	}
+	
+	@Test
 	public void getAllRecipes() throws Exception {
 		//setup
 		List<Recipe> expectedRecipe = jsonMapper.readValue(allRecipesJson, new TypeReference<List<Recipe>>(){});
-		when(mockRecipeService.getRecipes()).thenReturn(expectedRecipe);
+		//when(mockRecipeService.getRecipes()).thenReturn(expectedRecipe);
 		
 		String requestUrl = String.format(urlTemplate, port, "");
 		String expected = new String(Files.readAllBytes(allRecipesResponse.toPath()));
@@ -126,7 +145,7 @@ public class RecipeControllerTest {
 				.andExpect(status().isOk())
 				.andExpect(content().contentType("application/json;charset=UTF-8"))
 				.andExpect(content().json(expected));
-		verify(mockRecipeService).getRecipes();
+//		verify(mockRecipeService).getRecipes();
 	}
 	
 	@Test

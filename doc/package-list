@@ -1,0 +1,7 @@
+com.softbank.recipesitory
+com.softbank.recipesitory.controller
+com.softbank.recipesitory.dao
+com.softbank.recipesitory.exception
+com.softbank.recipesitory.models
+com.softbank.recipesitory.repository
+com.softbank.recipesitory.service

@@ -16,9 +16,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class MessageResponse {
+public class MessageResponse { 
 	@JsonView(MessageResponseViews.MessageOnly.class)
-	String message;				/** リクエストに返信メッセージ */
+	Messages message;				/** リクエストに返信メッセージ */
 	@JsonView(MessageResponseViews.MessageWithRecipe.class)
 	List<Recipe> recipe;		/** レシピがあれば、返す */
 	@JsonView(MessageResponseViews.MessageWithRequired.class)

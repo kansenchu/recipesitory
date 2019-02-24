@@ -11,6 +11,6 @@ package com.softbank.recipesitory.models;
  *
  */
 public class RecipeViews {
-	public static class ExcludeId {}
-	public static class IncludeId extends ExcludeId {}
+	public static interface ExcludeId {}
+	public static interface IncludeId extends ExcludeId {}
 }
