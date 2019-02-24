@@ -129,7 +129,6 @@ public class RecipeController {
 	@ExceptionHandler(InvalidRecipeException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public ErrorResponse invalidReceipeHandler(InvalidRecipeException ex) {
-		System.out.println("this sthing");
 		return new ErrorResponse(Messages.CREATION_FAILED, ex.getMessage());
 	}
 	
