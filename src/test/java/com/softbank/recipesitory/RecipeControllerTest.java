@@ -170,7 +170,7 @@ public class RecipeControllerTest {
 		SuccessResponse actual = rController.addRecipe(newRecipe);
 		
 		//act
-		mockMvc.perform(MockMvcRequestBuilders.get(requestUrl))
+		mockMvc.perform(MockMvcRequestBuilders.post(requestUrl))
 		
 		//verify
 				.andExpect(status().isOk())
@@ -182,18 +182,19 @@ public class RecipeControllerTest {
 	@Test
 	public void editRecipe() throws Exception {
 		//setup
+		int recipeId = 1;
 		Recipe newRecipe = jsonMapper.readValue(addRecipeJson, Recipe.class);
 		when(mockRecipeService.editRecipe(1, newRecipe)).thenReturn(newRecipe);
 		
 
-		String requestUrl = String.format(urlTemplate, port, "");
+		String requestUrl = String.format(urlTemplate, port, recipeId);
 		String expected = new String(Files.readAllBytes(updateSuccessResponse.toPath()));
 		
 		//act
 		SuccessResponse actual = rController.addRecipe(newRecipe);
 		
 		//act
-		mockMvc.perform(MockMvcRequestBuilders.get(requestUrl))
+		mockMvc.perform(MockMvcRequestBuilders.patch(requestUrl))
 		
 		//verify
 				.andExpect(status().isOk())
@@ -212,7 +213,7 @@ public class RecipeControllerTest {
 		String expected = new String(Files.readAllBytes(notFoundResponse.toPath()));
 		
 		//act
-		mockMvc.perform(MockMvcRequestBuilders.get(requestUrl))
+		mockMvc.perform(MockMvcRequestBuilders.patch(requestUrl))
 		
 		//verify
 				.andExpect(status().is(404))
@@ -224,16 +225,22 @@ public class RecipeControllerTest {
 	@Test
 	public void removeRecipe() throws Exception {
 		//setup
-		Recipe expected = mock(Recipe.class);
-		int id = 1;
-		when(mockRecipeService.removeRecipe(id)).thenReturn(expected);
+		Recipe expectedRecipe = jsonMapper.readValue(oneRecipeJson, Recipe.class);;
+		int recipeId = 1;
+		when(mockRecipeService.removeRecipe(recipeId)).thenReturn(expectedRecipe); 
+		
+		String requestUrl = String.format(urlTemplate, port, recipeId);
+		System.out.println(requestUrl);
+		String expected = new String(Files.readAllBytes(deletionSuccessResponse.toPath()));
 		
 		//act
-		SuccessResponse actual = rController.removeRecipe(id);
+		mockMvc.perform(MockMvcRequestBuilders.delete(requestUrl))
 		
 		//verify
-		verify(mockRecipeService).removeRecipe(id);
-		assertEquals(expected, actual);
+				.andExpect(status().isOk())
+				.andExpect(content().contentType("application/json;charset=UTF-8"))
+				.andExpect(content().json(expected));
+		verify(mockRecipeService).removeRecipe(recipeId);
 	}
 	
 	@Test
@@ -246,7 +253,7 @@ public class RecipeControllerTest {
 		String expected = new String(Files.readAllBytes(notFoundResponse.toPath()));
 		
 		//act
-		mockMvc.perform(MockMvcRequestBuilders.get(requestUrl))
+		mockMvc.perform(MockMvcRequestBuilders.delete(requestUrl))
 		
 		//verify
 				.andExpect(status().is(404))
