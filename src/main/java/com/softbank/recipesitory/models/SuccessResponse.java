@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonView;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * リクゥエスト成功して、一個のレシピか、メッセージだけ返す用POJOクラス

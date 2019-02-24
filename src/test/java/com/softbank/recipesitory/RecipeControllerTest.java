@@ -1,7 +1,9 @@
 package com.softbank.recipesitory;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -20,7 +22,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,7 +30,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -37,7 +37,6 @@ import org.springframework.web.context.WebApplicationContext;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.softbank.recipesitory.controller.RecipeController;
-import com.softbank.recipesitory.dao.RecipeDao;
 import com.softbank.recipesitory.exception.RecipeNotFoundException;
 import com.softbank.recipesitory.models.Recipe;
 import com.softbank.recipesitory.models.RecipeViews;
@@ -160,12 +159,12 @@ public class RecipeControllerTest {
 	}
 	
 	@Test
-	public void addRecipeTest() throws Exception {
+	public void addRecipe() throws Exception {
 		//setup
 		String requestUrl = String.format(urlTemplate, port, "");
 		Recipe recipe = jsonMapper.readValue(addRecipeJson, Recipe.class);
 		String parameter = jsonMapper.writeValueAsString(recipe);
-		String expected = jsonMapper.writerWithView(RecipeViews.ExcludeId.class).writeValueAsString(recipe);
+		String expected = new String(Files.readAllBytes(creationSuccessResponse.toPath()));
 		
 		//act
 		mockMvc.perform(MockMvcRequestBuilders.post(requestUrl)
@@ -180,62 +179,40 @@ public class RecipeControllerTest {
 	}
 	
 	@Test
-	public void addRecipe() throws Exception {
-		//setup
-		Recipe newRecipe = jsonMapper.readValue(addRecipeJson, Recipe.class);
-		when(mockRecipeService.addRecipe(newRecipe)).thenReturn(newRecipe);
-		
-
-		String requestUrl = String.format(urlTemplate, port, "");
-		String expected = new String(Files.readAllBytes(creationSuccessResponse.toPath()));
-		
-		//act
-		SuccessResponse actual = rController.addRecipe(newRecipe);
-		
-		//act
-		mockMvc.perform(MockMvcRequestBuilders.post(requestUrl))
-		
-		//verify
-				.andExpect(status().isOk())
-				.andExpect(content().contentType("application/json;charset=UTF-8"))
-				.andExpect(content().json(expected));
-		verify(mockRecipeService).addRecipe(any(Recipe.class));
-	}
-	
-	@Test
 	public void editRecipe() throws Exception {
 		//setup
-		int recipeId = 1;
-		Recipe newRecipe = jsonMapper.readValue(addRecipeJson, Recipe.class);
-		when(mockRecipeService.editRecipe(1, newRecipe)).thenReturn(newRecipe);
-
-		String requestUrl = String.format(urlTemplate, port, recipeId);
+		String requestUrl = String.format(urlTemplate, port, 1);
+		Recipe recipe = jsonMapper.readValue(addRecipeJson, Recipe.class);
+		String parameter = jsonMapper.writeValueAsString(recipe);
+		System.out.println(parameter);
 		String expected = new String(Files.readAllBytes(updateSuccessResponse.toPath()));
 		
 		//act
-		SuccessResponse actual = rController.addRecipe(newRecipe);
-		
-		//act
-		mockMvc.perform(MockMvcRequestBuilders.patch(requestUrl))
+		mockMvc.perform(MockMvcRequestBuilders.patch(requestUrl)
+											.contentType(MediaType.APPLICATION_JSON)
+											.content(parameter))
 		
 		//verify
 				.andExpect(status().isOk())
 				.andExpect(content().contentType("application/json;charset=UTF-8"))
 				.andExpect(content().json(expected));
-		verify(mockRecipeService).editRecipe(1, any(Recipe.class));
+		verify(mockRecipeService).addRecipe(recipe);
 	}
 	
 	@Test
 	public void updateNonexistentRecipe() throws Exception {
 		//setup
 		int recipeId = 999;
-		when(mockRecipeService.editRecipe(eq(recipeId), any(Recipe.class))).thenThrow(new RecipeNotFoundException());
-		
 		String requestUrl = String.format(urlTemplate, port, recipeId);
-		String expected = new String(Files.readAllBytes(notFoundResponse.toPath()));
+		Recipe recipe = jsonMapper.readValue(addRecipeJson, Recipe.class);
+		String parameter = jsonMapper.writeValueAsString(recipe);
+		System.out.println(parameter);
+		String expected = new String(Files.readAllBytes(updateSuccessResponse.toPath()));
 		
 		//act
-		mockMvc.perform(MockMvcRequestBuilders.patch(requestUrl))
+		mockMvc.perform(MockMvcRequestBuilders.patch(requestUrl)
+											.contentType(MediaType.APPLICATION_JSON)
+											.content(parameter))
 		
 		//verify
 				.andExpect(status().is(404))
