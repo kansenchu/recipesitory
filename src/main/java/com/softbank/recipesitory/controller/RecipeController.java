@@ -72,7 +72,17 @@ public class RecipeController {
 	 * @return 新しいレシピを含めてるレスポンス
 	 */
 	@RequestMapping(method=RequestMethod.POST)
-	public SuccessResponse addRecipe(@Valid @RequestBody Recipe newRecipe) {
+	public SuccessResponse addRecipe(@RequestBody Recipe newRecipe) {
+		ArrayList<String> missing = new ArrayList<String>();
+		if (newRecipe.getTitle() == null) missing.add("title");
+		if (newRecipe.getMakingTime() == null) missing.add("making_time");
+		if (newRecipe.getIngredients() == null) missing.add("ingredients");
+		if (newRecipe.getServes() == null) missing.add("serves");
+		if (newRecipe.getCost() == null) missing.add("cost");
+		if (!missing.isEmpty()) {
+			throw new InvalidRecipeException(String.join(",", missing));
+		}
+				
 		Recipe actualRecipe = recipeService.addRecipe(newRecipe);
 		return new SuccessResponse(Messages.CREATION_SUCCESS, actualRecipe);
 	}

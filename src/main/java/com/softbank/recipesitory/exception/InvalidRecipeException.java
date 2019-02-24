@@ -22,8 +22,8 @@ public class InvalidRecipeException extends RuntimeException {
 	 * 指定したメッセージを入れます。
 	 * @param msg エラーメッセージ
 	 */
-	public InvalidRecipeException(Messages msg) {
-		super(msg.getMessage());
+	public InvalidRecipeException(String msg) {
+		super(msg);
 	}
 	
 }
