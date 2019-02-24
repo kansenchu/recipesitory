@@ -9,6 +9,8 @@ import com.softbank.recipesitory.models.Messages;
  */
 public class InvalidRecipeException extends Exception {
 
+	private static final long serialVersionUID = -769737726528436633L;
+
 	/**
 	 * 基本なException constructor
 	 */
