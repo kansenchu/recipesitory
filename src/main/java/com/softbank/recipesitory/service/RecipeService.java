@@ -34,8 +34,6 @@ public class RecipeService {
 	
 	ModelMapper mapper = new ModelMapper();
 	
-	Supplier<InvalidRecipeException> notFound = () -> new InvalidRecipeException(Messages.NOT_FOUND);
-	
 	/**
 	 * 指定したIDのレシピを返す
 	 * @param id 欲しいレシピ
