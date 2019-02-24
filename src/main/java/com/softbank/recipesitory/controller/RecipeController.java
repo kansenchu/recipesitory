@@ -73,20 +73,22 @@ public class RecipeController {
 	 */
 	@RequestMapping(method=RequestMethod.POST)
 	public SuccessResponse addRecipe(@Valid @RequestBody Recipe newRecipe) {
-		return new SuccessResponse(Messages.CREATION_SUCCESS, recipeService.addRecipe(newRecipe));
+		Recipe actualRecipe = recipeService.addRecipe(newRecipe);
+		return new SuccessResponse(Messages.CREATION_SUCCESS, actualRecipe);
 	}
 	
 	/**
 	 * レシピを変更するメソッド。
 	 * 指定していないフィルドは古いものを使うままにします。
 	 * @param id 変えたいレシピのid
-	 * @param recipe 変えたいもの詳細
+	 * @param ecipe 変えたいもの詳細
 	 * @return 変更したレシピ詳細
 	 */
 	@JsonView(ResponseViews.MessageWithRecipe.class)
 	@RequestMapping(value="/{id}", method=RequestMethod.PATCH)
 	public SuccessResponse editRecipe(@PathVariable int id, @RequestBody Recipe recipe) {
-		return new SuccessResponse(Messages.UPDATE_SUCCESS, recipeService.editRecipe(id, recipe));
+		Recipe newRecipe = recipeService.editRecipe(id, recipe);
+		return new SuccessResponse(Messages.UPDATE_SUCCESS, newRecipe);
 	}
 
 	/**
@@ -97,6 +99,7 @@ public class RecipeController {
 	@JsonView(ResponseViews.MessageOnly.class)
 	@RequestMapping(value="/{id}", method=RequestMethod.DELETE)
 	public SuccessResponse removeRecipe(@PathVariable int id) {
+		recipeService.removeRecipe(id);
 		return new SuccessResponse(Messages.DELETION_SUCCESS);
 	}
 	

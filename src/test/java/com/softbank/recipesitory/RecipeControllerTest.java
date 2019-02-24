@@ -25,9 +25,11 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -38,6 +40,7 @@ import com.softbank.recipesitory.controller.RecipeController;
 import com.softbank.recipesitory.dao.RecipeDao;
 import com.softbank.recipesitory.exception.RecipeNotFoundException;
 import com.softbank.recipesitory.models.Recipe;
+import com.softbank.recipesitory.models.RecipeViews;
 import com.softbank.recipesitory.models.SuccessResponse;
 import com.softbank.recipesitory.service.RecipeService;
 
@@ -97,25 +100,25 @@ public class RecipeControllerTest {
 		MockitoAnnotations.initMocks(this);
 		mockMvc = MockMvcBuilders.standaloneSetup(rController).build();
 	}
-
+	
 	@Test
-	public void getOneRecipe() throws Exception {
+	public void deleteOneRecipe() throws Exception {
 		//setup
 		Recipe expectedRecipe = jsonMapper.readValue(oneRecipeJson, Recipe.class);
 		int recipeId = expectedRecipe.getId();
-		when(mockRecipeService.getRecipe(recipeId)).thenReturn(expectedRecipe);
+		when(mockRecipeService.removeRecipe(recipeId)).thenReturn(expectedRecipe);
 		
 		String requestUrl = String.format(urlTemplate, port, recipeId);
-		String expected = new String(Files.readAllBytes(oneRecipeResponse.toPath()));
+		String expected = new String(Files.readAllBytes(deletionSuccessResponse.toPath()));
 		
 		//act
-		mockMvc.perform(MockMvcRequestBuilders.get(requestUrl))
+		mockMvc.perform(MockMvcRequestBuilders.delete(requestUrl))
 		
 		//verify
 				.andExpect(status().isOk())
 				.andExpect(content().contentType("application/json;charset=UTF-8"))
 				.andExpect(content().json(expected));
-		verify(mockRecipeService).getRecipe(recipeId);
+		verify(mockRecipeService).removeRecipe(recipeId);
 	}
 	
 	@Test
@@ -157,6 +160,26 @@ public class RecipeControllerTest {
 	}
 	
 	@Test
+	public void addRecipeTest() throws Exception {
+		//setup
+		String requestUrl = String.format(urlTemplate, port, "");
+		Recipe recipe = jsonMapper.readValue(addRecipeJson, Recipe.class);
+		String parameter = jsonMapper.writeValueAsString(recipe);
+		String expected = jsonMapper.writerWithView(RecipeViews.ExcludeId.class).writeValueAsString(recipe);
+		
+		//act
+		mockMvc.perform(MockMvcRequestBuilders.post(requestUrl)
+											.contentType(MediaType.APPLICATION_JSON)
+											.content(parameter))
+		
+		//verify
+				.andExpect(status().isOk())
+				.andExpect(content().contentType("application/json;charset=UTF-8"))
+				.andExpect(content().json(expected));
+		verify(mockRecipeService).addRecipe(recipe);
+	}
+	
+	@Test
 	public void addRecipe() throws Exception {
 		//setup
 		Recipe newRecipe = jsonMapper.readValue(addRecipeJson, Recipe.class);
@@ -185,7 +208,6 @@ public class RecipeControllerTest {
 		int recipeId = 1;
 		Recipe newRecipe = jsonMapper.readValue(addRecipeJson, Recipe.class);
 		when(mockRecipeService.editRecipe(1, newRecipe)).thenReturn(newRecipe);
-		
 
 		String requestUrl = String.format(urlTemplate, port, recipeId);
 		String expected = new String(Files.readAllBytes(updateSuccessResponse.toPath()));
