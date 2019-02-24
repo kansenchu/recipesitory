@@ -8,12 +8,14 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.validation.Valid;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.softbank.recipesitory.dao.RecipeDao;
 import com.softbank.recipesitory.exception.InvalidRecipeException;
+import com.softbank.recipesitory.exception.RecipeNotFoundException;
 import com.softbank.recipesitory.models.Messages;
 import com.softbank.recipesitory.models.Recipe;
 import com.softbank.recipesitory.repository.RecipeRepo;
@@ -36,17 +38,17 @@ public class RecipeService {
 	
 	/**
 	 * 指定したIDのレシピを返す
-	 * @param id reference to desired Recipe
-	 * @return the relevant Recipe
-	 * @throws InvalidRecipeException 
+	 * @param id 欲しいレシピ
+	 * @return 指定したレシピ
+	 * @throws RecipeNotFoundException レシピ見つかれない時
 	 */
-	public Recipe getRecipe(int id) throws InvalidRecipeException {
-		return mapToRecipe(repository.findById(id).orElseThrow(notFound));
+	public Recipe getRecipe(int id) throws RecipeNotFoundException {
+		return mapToRecipe(repository.findById(id).orElseThrow(RecipeNotFoundException::new));
 	}
 	
 	/**
-	 * Retrieve all Recipes.
-	 * @return a List of all Recipes
+	 * 全レシピ取得
+	 * @return 全レシピのリスト
 	 */
 	public List<Recipe> getRecipes() {
 		return repository.findAll(Sort.by("id").ascending())
@@ -57,50 +59,69 @@ public class RecipeService {
 	}
 	
 	/**
-	 * Add the given Recipe into the store.
-	 * @param Recipe to be added
-	 * @return the Recipe that was added; this should be updated with the actual id in the store.
-	 * @throws InvalidRecipeException 
+	 * レシピをDBに加える
+	 * @param 加えるレシピの情報
+	 * @return 実際にDBに存在してる新しいレシピ
+	 * @throws InvalidRecipeException レシピがあっていない時
 	 */
-	public Recipe addRecipe(@Valid Recipe recipe) throws InvalidRecipeException {
-		RecipeDao recipeDao = repository.save(mapToRecipeDao(recipe));
-		return mapToRecipe(repository.findById(recipeDao.getId())
-				.orElseThrow(notFound));
+	public Recipe addRecipe(@Valid Recipe recipe) {
+		try {
+			RecipeDao toSave = mapToRecipeDao(recipe);
+			System.out.println(toSave);
+			RecipeDao recipeDao = repository.save(mapToRecipeDao(recipe));
+			return mapToRecipe(repository.findById(recipeDao.getId())
+					.orElseThrow(RecipeNotFoundException::new));
+		} catch (ConstraintViolationException ex) {
+			throw new RecipeNotFoundException();
+		}
 	}
 	
 	/**
-	 * Edit the current existing Recipe in the store.
-	 * @param id of the Recipe to be updated
-	 * @param Recipe the new details of the Recipe
-	 * @return the currently inserted record of id
-	 * @throws InvalidRecipeException 
+	 * 現在存在してるレシピを更新
+	 * @param id 変えたいレシピ
+	 * @param recipe 新しい詳細
+	 * @return 更新されたレシピ
+	 * @throws InvalidRecipeException レシピが見つからない時
 	 */
-	public Recipe editRecipe(int id, Recipe recipe) throws InvalidRecipeException {
+	public Recipe editRecipe(int id, Recipe recipe) throws RecipeNotFoundException {
 		return repository.findById(id).map((Function<RecipeDao, Recipe>) oldRecipe -> {
-			recipe.setId(oldRecipe.getId());
-			RecipeDao recipeDao = mapToRecipeDao(recipe);
-			return mapToRecipe(repository.save(recipeDao));
-		}).orElseThrow(notFound);
+			if (recipe.getTitle() != null) oldRecipe.setTitle(recipe.getTitle());
+			if (recipe.getMakingTime() != null) oldRecipe.setMakingTime(recipe.getMakingTime());
+			if (recipe.getServes() != null) oldRecipe.setServes(recipe.getServes());
+			if (recipe.getIngredients() != null) oldRecipe.setIngredients(recipe.getIngredients());
+			if (recipe.getCost() != null) oldRecipe.setCost(Integer.parseInt(recipe.getCost()));
+			return mapToRecipe(repository.save(oldRecipe));
+		}).orElseThrow(RecipeNotFoundException::new);
 	}
 	
 	/**
-	 * Removes the given Recipe.
-	 * @param id of the Recipe to be deleted.
-	 * @return the deleted Recipe
-	 * @throws InvalidRecipeException 
+	 * レシピを削除する
+	 * @param id 削除したいレシピID
+	 * @return 削除したレシピ
+	 * @throws InvalidRecipeException レシピが見つからない時
 	 */
-	public Recipe removeRecipe(int id) throws InvalidRecipeException {
+	public Recipe removeRecipe(int id) {
 		return repository.findById(id)
 				.map((Function<RecipeDao, Recipe>) recipe -> {
 					repository.delete(recipe);
 					return mapToRecipe(recipe);
-				}).orElseThrow(notFound);
+				}).orElseThrow(RecipeNotFoundException::new);
 	}
 	
+	/**
+	 * DAOからREST APIを投げるオブジェクトに変換
+	 * @param recipeDao 変換したいDAO
+	 * @return 平等のAPIモデルオブジェクト
+	 */
 	private Recipe mapToRecipe(RecipeDao RecipeDao) {
 		return mapper.map(RecipeDao, Recipe.class);
 	}
 	
+	/**
+	 * REST APIを投げるオブジェクに変換
+	 * @param recipe 変換したいレシピ
+	 * @return 平等のDAOオブジェクト
+	 */
 	private RecipeDao mapToRecipeDao(Recipe Recipe) {
 		return mapper.map(Recipe, RecipeDao.class);
 	}

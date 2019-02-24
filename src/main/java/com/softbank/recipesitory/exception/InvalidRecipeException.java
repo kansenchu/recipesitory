@@ -7,7 +7,7 @@ import com.softbank.recipesitory.models.Messages;
  * @author pikachoo
  *
  */
-public class InvalidRecipeException extends Exception {
+public class InvalidRecipeException extends RuntimeException {
 
 	private static final long serialVersionUID = -769737726528436633L;
 
